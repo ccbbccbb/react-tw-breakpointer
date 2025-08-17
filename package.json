@@ -1,0 +1,85 @@
+{
+  "name": "react-tw-breakpointer",
+  "version": "0.1.0",
+  "description": "A React component that displays the current Tailwind CSS breakpoint and viewport dimensions",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --sourcemap --clean --external react,react-dom",
+    "dev": "tsup src/index.ts --format esm,cjs --dts --sourcemap --watch --external react,react-dom",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check --write .",
+    "format": "biome format --write .",
+    "check": "bun run typecheck && biome check .",
+    "prepublishOnly": "bun run check && bun run build",
+    "publish:dry": "bun run build && npm pack --dry-run",
+    "publish:npm": "bun run build && npm publish",
+    "size": "bun run build && bundlesize",
+    "analyze": "bun run build && echo 'ESM:' && gzip -c dist/index.js | wc -c && echo 'CJS:' && gzip -c dist/index.cjs | wc -c",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "keywords": [
+    "react",
+    "tailwind",
+    "tailwindcss",
+    "breakpoint",
+    "responsive",
+    "development",
+    "debugging",
+    "viewport",
+    "utility",
+    "devtools"
+  ],
+  "author": "charles-édouard <char@automatethestack.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ccbbccbb/react-tw-breakpointer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ccbbccbb/react-tw-breakpointer/issues"
+  },
+  "homepage": "https://github.com/ccbbccbb/react-tw-breakpointer#readme",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18",
+    "tailwindcss": ">=4.0.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/node": "^24.2.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "bundlesize": "^0.18.2",
+    "happy-dom": "^15.11.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "optionalDependencies": {
+    "@fontsource/jetbrains-mono": "^5.0.0"
+  }
+}

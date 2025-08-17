@@ -1,0 +1,16 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["^@types/"],
+      "groupName": "type definitions"
+    },
+    {
+      "matchPackagePatterns": ["^@biomejs/"],
+      "groupName": "biome"
+    }
+  ],
+  "schedule": ["before 6am on monday"],
+  "timezone": "UTC"
+}

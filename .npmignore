@@ -1,0 +1,37 @@
+# Source files
+src/
+tsup.config.ts
+tsconfig.json
+biome.json
+vitest.config.ts
+
+# Development files
+.gitignore
+.npmrc
+bun.lockb
+
+# Build artifacts
+*.log
+node_modules/
+
+# Editor files
+.vscode/
+.idea/
+
+# Testing
+coverage/
+*.test.*
+*.spec.*
+__tests__/
+test/
+tests/
+
+# Documentation source
+docs/
+
+# CI/CD
+.github/
+
+# Bundle analysis
+.bundlesize.json
+renovate.json
