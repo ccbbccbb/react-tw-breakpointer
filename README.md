@@ -1,13 +1,21 @@
 # react-tw-breakpointer
 
-A development utility React component that displays the current Tailwind CSS breakpoint and viewport dimensions in a customizable overlay. Perfect for responsive design development and debugging.
+<p align="center">
+  <img src="./public/react-tw-breakpointer-preview.png" alt="react-tw-breakpointer preview" />
+ </p>
 
-![npm version](https://img.shields.io/npm/v/react-tw-breakpointer)
-![bundle size](https://img.shields.io/bundlephobia/minzip/react-tw-breakpointer)
-![license](https://img.shields.io/npm/l/react-tw-breakpointer)
-![CI](https://github.com/ccbbccbb/react-tw-breakpointer/workflows/CI/badge.svg)
-![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue)
-![Tree Shakeable](https://img.shields.io/badge/Tree%20Shakeable-Yes-brightgreen)
+<p align="center">
+  <img src="https://img.shields.io/npm/v/react-tw-breakpointer" alt="npm version" />
+  <img src="https://img.shields.io/bundlephobia/minzip/react-tw-breakpointer" alt="bundle size" />
+  <img src="https://img.shields.io/npm/l/react-tw-breakpointer" alt="license" />
+  <img src="https://github.com/ccbbccbb/react-tw-breakpointer/workflows/CI/badge.svg" alt="CI" />
+  <img src="https://img.shields.io/badge/TypeScript-Ready-blue" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Tree%20Shakeable-Yes-brightgreen" alt="Tree Shakeable" />
+ </p>
+
+ <p align="center">
+ A lightweight dev util made for Tailwind CSS + Next.js/React. It displays the current Tailwind CSS breakpoint at the bottom of the screen as well as viewport dimensions in a customizable overlay. Perfect for responsive design development and debugging.
+ </p>
 
 ## Features
 
