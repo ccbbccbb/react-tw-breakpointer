@@ -15,7 +15,6 @@ export interface BreakPointerProps {
   toggleOffKey?: string;
   position?: Position;
   zIndex?: number;
-  hideInProduction?: boolean;
   showDimensions?: boolean;
   className?: string;
   style?: React.CSSProperties;

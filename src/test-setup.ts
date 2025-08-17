@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 import { afterEach, beforeEach } from 'vitest';
 
 // Mock process.env for tests
@@ -11,12 +11,8 @@ beforeEach(() => {
 afterEach(() => {
   process.env = originalEnv;
 });
-
 // Global test utilities
-declare global {
-  const mockEnvironment: (env: 'development' | 'production' | 'test') => void;
-}
-
+// Define on globalThis without redeclaring types here (types live in global.d.ts)
 (globalThis as any).mockEnvironment = (env: 'development' | 'production' | 'test') => {
   process.env.NODE_ENV = env;
 };

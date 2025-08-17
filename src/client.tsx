@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export type Position =
   | 'bottom-center'
@@ -21,24 +21,73 @@ export interface BreakPointerProps {
   toggleOffKey?: string;
   position?: Position;
   zIndex?: number;
-  hideInProduction?: boolean;
   showDimensions?: boolean;
   className?: string;
   style?: React.CSSProperties;
   fontFamily?: string;
+  /** Optional override for Tailwind-like breakpoints (in px). */
+  screens?: {
+    sm?: number;
+    md?: number;
+    lg?: number;
+    xl?: number;
+    '2xl'?: number;
+  };
 }
 
 const DEFAULT_FONT_FAMILY =
   'JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "DejaVu Sans Mono", "Courier New", monospace';
 
-const positionClasses: Record<Position, string> = {
-  'bottom-center': 'fixed bottom-2 left-1/2 -translate-x-1/2',
-  'top-center': 'fixed top-2 left-1/2 -translate-x-1/2',
-  'top-left': 'fixed top-2 left-2',
-  'top-right': 'fixed top-2 right-2',
-  'bottom-left': 'fixed bottom-2 left-2',
-  'bottom-right': 'fixed bottom-2 right-2',
-};
+function ensureStylesInjected(cssText: string) {
+  if (typeof document === 'undefined') {
+    return;
+  }
+  const id = 'rtwbp-styles';
+  const existing = document.getElementById(id) as HTMLStyleElement | null;
+  if (existing) {
+    if (existing.textContent !== cssText) {
+      existing.textContent = cssText;
+    }
+    return;
+  }
+  const style = document.createElement('style');
+  style.id = id;
+  style.textContent = cssText;
+  document.head.appendChild(style);
+}
+
+function generateCss(params: {
+  sm: number;
+  md: number;
+  lg: number;
+  xl: number;
+  x2l: number;
+}) {
+  const { sm, md, lg, xl, x2l } = params;
+  const toMax = (n: number) => `${Math.max(0, n - 0.02)}px`;
+  return `
+.rtwbp-container{position:fixed;border:2px solid #000;border-radius:4px;font-size:12px;line-height:1.1;background:transparent}
+.rtwbp-bottom-center{bottom:8px;left:50%;transform:translateX(-50%)}
+.rtwbp-top-center{top:8px;left:50%;transform:translateX(-50%)}
+.rtwbp-top-left{top:8px;left:8px}
+.rtwbp-top-right{top:8px;right:8px}
+.rtwbp-bottom-left{bottom:8px;left:8px}
+.rtwbp-bottom-right{bottom:8px;right:8px}
+.rtwbp-badge{display:none;padding:4px 8px;font-family:inherit;font-weight:600;letter-spacing:-0.01em}
+.rtwbp-xs{background:#ec2427;color:#fff}
+.rtwbp-sm{background:#f36525;color:#fff}
+.rtwbp-md{background:#edb41f;color:#fff}
+.rtwbp-lg{background:#f7ee49;color:#000}
+.rtwbp-xl{background:#4686c5;color:#fff}
+.rtwbp-2xl{background:#45b64a;color:#fff}
+@media (max-width:${toMax(sm)}){.rtwbp-xs{display:block}}
+@media (min-width:${sm}px) and (max-width:${toMax(md)}){.rtwbp-sm{display:block}}
+@media (min-width:${md}px) and (max-width:${toMax(lg)}){.rtwbp-md{display:block}}
+@media (min-width:${lg}px) and (max-width:${toMax(xl)}){.rtwbp-lg{display:block}}
+@media (min-width:${xl}px) and (max-width:${toMax(x2l)}){.rtwbp-xl{display:block}}
+@media (min-width:${x2l}px){.rtwbp-2xl{display:block}}
+`;
+}
 
 export const BreakPointer: React.FC<BreakPointerProps> = ({
   initiallyVisible = true,
@@ -47,11 +96,11 @@ export const BreakPointer: React.FC<BreakPointerProps> = ({
   toggleOffKey,
   position = 'bottom-center',
   zIndex = 9999,
-  hideInProduction = true,
   showDimensions = true,
   className = '',
   style = {},
   fontFamily = DEFAULT_FONT_FAMILY,
+  screens,
 }) => {
   const [isVisible, setIsVisible] = useState(initiallyVisible);
   const [viewport, setViewport] = useState({
@@ -110,14 +159,20 @@ export const BreakPointer: React.FC<BreakPointerProps> = ({
     };
   }, [resolvedToggleOnKey, resolvedToggleOffKey]);
 
-  // Production auto-hide
-  if (
-    hideInProduction &&
-    typeof process !== 'undefined' &&
-    process.env?.NODE_ENV === 'production'
-  ) {
-    return null;
-  }
+  const resolvedScreens = useMemo(() => {
+    return {
+      sm: screens?.sm ?? 640,
+      md: screens?.md ?? 768,
+      lg: screens?.lg ?? 1024,
+      xl: screens?.xl ?? 1280,
+      x2l: screens?.['2xl'] ?? 1536,
+    } as const;
+  }, [screens?.sm, screens?.md, screens?.lg, screens?.xl, screens?.['2xl']]);
+
+  useEffect(() => {
+    const css = generateCss(resolvedScreens);
+    ensureStylesInjected(css);
+  }, [resolvedScreens]);
 
   if (!isMounted) {
     return null;
@@ -126,7 +181,18 @@ export const BreakPointer: React.FC<BreakPointerProps> = ({
     return null;
   }
 
-  const positionClass = positionClasses[position] || positionClasses['bottom-center'];
+  const positionClass =
+    position === 'top-center'
+      ? 'rtwbp-top-center'
+      : position === 'top-left'
+        ? 'rtwbp-top-left'
+        : position === 'top-right'
+          ? 'rtwbp-top-right'
+          : position === 'bottom-left'
+            ? 'rtwbp-bottom-left'
+            : position === 'bottom-right'
+              ? 'rtwbp-bottom-right'
+              : 'rtwbp-bottom-center';
 
   const containerStyles: React.CSSProperties = {
     zIndex,
@@ -136,60 +202,60 @@ export const BreakPointer: React.FC<BreakPointerProps> = ({
 
   return (
     <div
-      className={`${positionClass} rounded border-2 border-black text-xs ${className}`}
+      className={`rtwbp-container ${positionClass} ${className}`}
       style={containerStyles}
       aria-hidden="true"
     >
-      <span className="block items-center bg-[#ec2427] px-2 py-1 font-mono font-semibold tracking-tighter text-white sm:hidden md:hidden lg:hidden xl:hidden 2xl:hidden">
-        1/6 <span className="text-black">•</span> xs <span className="text-black">•</span>{' '}
+      <span className="rtwbp-badge rtwbp-xs">
+        1/6 <span>•</span> xs <span>•</span>{' '}
         {showDimensions && (
-          <span className="text-gray-100">
-            {viewport.width}px <span className="text-black">&lt;</span> 640px
+          <span>
+            {viewport.width}px <span>&lt;</span> {resolvedScreens.sm}px
           </span>
         )}
       </span>
 
-      <span className="hidden items-center bg-[#f36525] px-2 py-1 font-mono font-semibold tracking-tighter text-white sm:block md:hidden lg:hidden xl:hidden 2xl:hidden">
-        2/6 <span className="text-black">•</span> sm <span className="text-black">•</span>{' '}
+      <span className="rtwbp-badge rtwbp-sm">
+        2/6 <span>•</span> sm <span>•</span>{' '}
         {showDimensions && (
-          <span className="text-gray-100">
-            {viewport.width}px <span className="text-black">&lt;</span> 768px
+          <span>
+            {viewport.width}px <span>&lt;</span> {resolvedScreens.md}px
           </span>
         )}
       </span>
 
-      <span className="hidden items-center bg-[#edb41f] px-2 py-1 font-mono font-semibold tracking-tighter text-white md:block lg:hidden xl:hidden 2xl:hidden">
-        3/6 <span className="text-black">•</span> md <span className="text-black">•</span>{' '}
+      <span className="rtwbp-badge rtwbp-md">
+        3/6 <span>•</span> md <span>•</span>{' '}
         {showDimensions && (
-          <span className="text-gray-100">
-            {viewport.width}px <span className="text-black">&lt;</span> 1024px
+          <span>
+            {viewport.width}px <span>&lt;</span> {resolvedScreens.lg}px
           </span>
         )}
       </span>
 
-      <span className="hidden items-center bg-[#f7ee49] px-2 py-1 font-mono font-semibold tracking-tighter text-black lg:block xl:hidden 2xl:hidden">
-        4/6 <span className="text-black">•</span> lg <span className="text-black">•</span>{' '}
+      <span className="rtwbp-badge rtwbp-lg">
+        4/6 <span>•</span> lg <span>•</span>{' '}
         {showDimensions && (
-          <span className="text-black">
-            {viewport.width}px <span className="text-black">&lt;</span> 1280px
+          <span>
+            {viewport.width}px <span>&lt;</span> {resolvedScreens.xl}px
           </span>
         )}
       </span>
 
-      <span className="hidden items-center bg-[#4686c5] px-2 py-1 font-mono font-semibold tracking-tighter text-white xl:block 2xl:hidden">
-        5/6 <span className="text-black">•</span> xl <span className="text-black">•</span>{' '}
+      <span className="rtwbp-badge rtwbp-xl">
+        5/6 <span>•</span> xl <span>•</span>{' '}
         {showDimensions && (
-          <span className="text-gray-100">
-            {viewport.width}px <span className="text-black">&lt;</span> 1536px
+          <span>
+            {viewport.width}px <span>&lt;</span> {resolvedScreens.x2l}px
           </span>
         )}
       </span>
 
-      <span className="hidden items-center bg-[#45b64a] px-2 py-1 font-mono font-semibold tracking-tighter text-white 2xl:block">
-        6/6 <span className="text-black">•</span> 2xl <span className="text-black">•</span>{' '}
+      <span className="rtwbp-badge rtwbp-2xl">
+        6/6 <span>•</span> 2xl <span>•</span>{' '}
         {showDimensions && (
-          <span className="text-gray-100">
-            {viewport.width}px <span className="text-black">≥</span> 1536px
+          <span>
+            {viewport.width}px <span>≥</span> {resolvedScreens.x2l}px
           </span>
         )}
       </span>

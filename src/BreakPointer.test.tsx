@@ -1,4 +1,7 @@
+/// <reference path="./global.d.ts" />
 import { render } from '@testing-library/react';
+import React from 'react';
+import '@testing-library/jest-dom/vitest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { BreakPointer } from './BreakPointer';
 
@@ -13,17 +16,7 @@ describe('BreakPointer - Core functionality', () => {
     expect(container).toBeInTheDocument();
   });
 
-  it('should not render in production by default', () => {
-    mockEnvironment('production');
-    const { container } = render(<BreakPointer />);
-    expect(container.firstChild).toBeNull();
-  });
-
-  it('should render in production when hideInProduction=false', () => {
-    mockEnvironment('production');
-    const { container } = render(<BreakPointer hideInProduction={false} />);
-    expect(container.firstChild).not.toBeNull();
-  });
+  // Production gating removed; component renders regardless of NODE_ENV
 
   it('should apply custom className', () => {
     const { container } = render(<BreakPointer className="custom-test-class" />);
@@ -70,12 +63,10 @@ describe('BreakPointer - Core functionality', () => {
   it('should apply different position classes', () => {
     const { container: container1 } = render(<BreakPointer position="top-left" />);
     const element1 = container1.firstChild as HTMLElement;
-    expect(element1?.className).toContain('top-2');
-    expect(element1?.className).toContain('left-2');
+    expect(element1?.className).toContain('rtwbp-top-left');
 
     const { container: container2 } = render(<BreakPointer position="bottom-right" />);
     const element2 = container2.firstChild as HTMLElement;
-    expect(element2?.className).toContain('bottom-2');
-    expect(element2?.className).toContain('right-2');
+    expect(element2?.className).toContain('rtwbp-bottom-right');
   });
 });

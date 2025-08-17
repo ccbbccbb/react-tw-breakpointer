@@ -15,7 +15,8 @@ A development utility React component that displays the current Tailwind CSS bre
 - **Viewport Dimensions** - Displays real-time width and height
 - **Color-Coded Indicators** - Each breakpoint has a unique color for quick identification
 - **Keyboard Toggle** - Visible by default; press 't' to turn on and 'Shift+T' to turn off (configurable)
-- **Production Safe** - Automatically hidden in production builds
+- **Client-only** - Import from a Client Component in App Router; resolves to a no-op on the server
+- **No Tailwind Dependency** - Ships its own lightweight CSS; no safelist or node_modules scan needed
 - **Zero Dependencies** - Only requires React as a peer dependency
 - **Highly Configurable** - Customize position, visibility, font, and more
 - **TypeScript Support** - Full type definitions included
@@ -151,8 +152,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 ```
 
 Behavior:
-- In development, the component renders on the client.
-- In production and on the server, it resolves to a no-op.
+- The component renders on the client whenever used from a Client Component.
+- On the server, it resolves to a no-op (to avoid RSC hook errors).
+- Uses an injected, namespaced stylesheet (`rtwbp-*`), independent of your Tailwind config.
 
 ### Next.js Pages Router
 
@@ -199,7 +201,8 @@ function App() {
 | `toggleOffKey`     | `string`              | `'T'`                | Keyboard key to turn the overlay off      |
 | `position`         | `Position`            | `'bottom-center'`    | Position of the overlay on screen         |
 | `zIndex`           | `number`              | `9999`               | z-index of the overlay                    |
-| `hideInProduction` | `boolean`             | `true`               | Automatically hide in production builds   |
+| `hideInProduction` | `boolean`             | `removed`            | Removed; component no longer auto-hides in prod |
+| `screens`          | `{ sm?, md?, lg?, xl?, '2xl'? }` | Tailwind defaults | Override breakpoint thresholds (px) |
 | `showDimensions`   | `boolean`             | `true`               | Show viewport width and height            |
 | `className`        | `string`              | `undefined`          | Additional CSS classes                    |
 | `style`            | `React.CSSProperties` | `undefined`          | Additional inline styles                  |
@@ -269,9 +272,9 @@ const config: BreakPointerProps = {
 ### Why isn't the component showing?
 
 1. Ensure it's rendered from a Client Component (App Router server files resolve to a no-op)
-2. Verify you're in development mode (`next dev`); production resolves to a no-op by default
-3. Try pressing the default keys: 't' turns on, 'Shift+T' turns off
-4. Ensure Tailwind CSS is properly configured and no z-index conflicts
+2. Try pressing the default keys: 't' turns on, 'Shift+T' turns off
+3. Check for overlapping overlays or z-index conflicts
+4. If you customized `screens`, verify the values match your expected breakpoints
 
 ### Can I use this without Tailwind CSS?
 
