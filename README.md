@@ -301,6 +301,9 @@ bun run lint
 
 # Check all (types, lint, format)
 bun run check
+
+# Dry run publish
+bun run publish:dry
 ```
 
 ## License
