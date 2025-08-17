@@ -1,8 +1,13 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: ['src/index.ts'],
+  entry: {
+    index: 'src/index.ts',
+    client: 'src/client.tsx',
+    noop: 'src/noop.ts',
+  },
   format: ['esm', 'cjs'],
+  bundle: false,
   dts: true,
   sourcemap: true,
   clean: true,
@@ -12,7 +17,6 @@ export default defineConfig({
   treeshake: true,
   target: 'es2020',
   platform: 'browser',
-  // Remove globalName to avoid UMD build overhead
   esbuildOptions: (options) => {
     options.drop = ['console', 'debugger'];
   },
