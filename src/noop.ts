@@ -11,6 +11,8 @@ export type Position =
 export interface BreakPointerProps {
   initiallyVisible?: boolean;
   toggleKey?: string;
+  toggleOnKey?: string;
+  toggleOffKey?: string;
   position?: Position;
   zIndex?: number;
   hideInProduction?: boolean;

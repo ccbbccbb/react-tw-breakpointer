@@ -14,7 +14,7 @@ A development utility React component that displays the current Tailwind CSS bre
 - **Live Breakpoint Display** - Shows current Tailwind breakpoint (xs, sm, md, lg, xl, 2xl)
 - **Viewport Dimensions** - Displays real-time width and height
 - **Color-Coded Indicators** - Each breakpoint has a unique color for quick identification
-- **Keyboard Toggle** - Press 't' (configurable) to show/hide
+- **Keyboard Toggle** - Visible by default; press 't' to turn on and 'Shift+T' to turn off (configurable)
 - **Production Safe** - Automatically hidden in production builds
 - **Zero Dependencies** - Only requires React as a peer dependency
 - **Highly Configurable** - Customize position, visibility, font, and more
@@ -96,30 +96,63 @@ function MyApp() {
 />
 ```
 
-### Next.js App Router
+### Next.js 15 App Router
+
+In App Router, render the component inside a Client Component. Importing from a Server Component resolves to a no-op by design.
+
+Option A: Use an existing Client Component (recommended)
 
 ```tsx
-// app/layout.tsx
-import "@fontsource/jetbrains-mono/variable.css";
-import { BreakPointer } from "react-tw-breakpointer";
+// app/providers.tsx
+'use client';
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+import { BreakPointer } from 'react-tw-breakpointer';
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      {children}
+      <BreakPointer />
+    </>
+  );
+}
+```
+
+Then include `<Providers>` in `app/layout.tsx`.
+
+Option B: Minimal client wrapper if you don't have one yet
+
+```tsx
+// app/components/BreakPointerClient.tsx
+'use client';
+
+import { BreakPointer } from 'react-tw-breakpointer';
+
+export function BreakPointerClient() {
+  return <BreakPointer />;
+}
+```
+
+```tsx
+// app/layout.tsx (server component)
+import type { ReactNode } from 'react';
+import { BreakPointerClient } from './components/BreakPointerClient';
+
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
         {children}
-        {process.env.NODE_ENV === "development" && <BreakPointer />}
+        <BreakPointerClient />
       </body>
     </html>
   );
 }
 ```
 
-**Note**: In App Router, `process.env.NODE_ENV` is available on the server, so the component is conditionally rendered server-side. This is more efficient than client-side conditional rendering since the component bundle isn't even sent to production users.
+Behavior:
+- In development, the component renders on the client.
+- In production and on the server, it resolves to a no-op.
 
 ### Next.js Pages Router
 
@@ -161,7 +194,9 @@ function App() {
 | Prop               | Type                  | Default              | Description                               |
 | ------------------ | --------------------- | -------------------- | ----------------------------------------- |
 | `initiallyVisible` | `boolean`             | `true`               | Whether the component is visible on mount |
-| `toggleKey`        | `string`              | `'t'`                | Keyboard key to toggle visibility         |
+| `toggleKey`        | `string`              | `deprecated`         | Deprecated; use `toggleOnKey`/`toggleOffKey` |
+| `toggleOnKey`      | `string`              | `'t'`                | Keyboard key to turn the overlay on       |
+| `toggleOffKey`     | `string`              | `'T'`                | Keyboard key to turn the overlay off      |
 | `position`         | `Position`            | `'bottom-center'`    | Position of the overlay on screen         |
 | `zIndex`           | `number`              | `9999`               | z-index of the overlay                    |
 | `hideInProduction` | `boolean`             | `true`               | Automatically hide in production builds   |
@@ -233,10 +268,10 @@ const config: BreakPointerProps = {
 
 ### Why isn't the component showing?
 
-1. Check if you're in production mode (`NODE_ENV=production`)
-2. Try pressing the toggle key (default: 't')
-3. Ensure Tailwind CSS is properly configured
-4. Check z-index conflicts with other overlays
+1. Ensure it's rendered from a Client Component (App Router server files resolve to a no-op)
+2. Verify you're in development mode (`next dev`); production resolves to a no-op by default
+3. Try pressing the default keys: 't' turns on, 'Shift+T' turns off
+4. Ensure Tailwind CSS is properly configured and no z-index conflicts
 
 ### Can I use this without Tailwind CSS?
 
