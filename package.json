@@ -1,15 +1,15 @@
 {
   "name": "react-tw-breakpointer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A React component that displays the current Tailwind CSS breakpoint and viewport dimensions",
   "type": "module",
   "main": "dist/index.cjs",
-  "module": "dist/index.mjs",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
+      "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     }
   },
