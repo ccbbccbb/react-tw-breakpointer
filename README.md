@@ -6,7 +6,6 @@
 
 <p align="center">
   <img src="https://img.shields.io/npm/v/react-tw-breakpointer" alt="npm version" />
-  <img src="https://img.shields.io/bundlephobia/minzip/react-tw-breakpointer" alt="bundle size" />
   <img src="https://img.shields.io/npm/l/react-tw-breakpointer" alt="license" />
   <img src="https://github.com/ccbbccbb/react-tw-breakpointer/workflows/CI/badge.svg" alt="CI" />
   <img src="https://img.shields.io/badge/TypeScript-Ready-blue" alt="TypeScript" />
